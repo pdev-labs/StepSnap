@@ -191,8 +191,6 @@ if sys.platform == 'linux':
 else:
     from pynput import mouse, keyboard
     import mss
-    
-    sct = mss.mss()
 
     def take_screenshot():
         global screenshot_counter, last_screenshot_time
@@ -205,7 +203,8 @@ else:
             time.sleep(0.1)
             filename = os.path.join(save_dir, f"step_{screenshot_counter:03d}.png")
             try:
-                sct.shot(output=filename)
+                with mss.mss() as sct:
+                    sct.shot(output=filename)
                 console.print(f"[green]✓ Captured:[/green] step_{screenshot_counter:03d}.png")
                 screenshot_counter += 1
             except Exception as e:
