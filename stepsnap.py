@@ -79,6 +79,16 @@ screenshot_lock = threading.Lock()
 last_screenshot_time = 0.0
 COOLDOWN_SECONDS = 1.0
 
+def append_to_markdown(counter, filename):
+    md_file = os.path.join(save_dir, "steps.md")
+    with open(md_file, "a", encoding="utf-8") as f:
+        f.write(f"### Step {counter}\n![Step {counter}]({os.path.basename(filename)})\n\n")
+    if sys.platform == 'linux' and sudo_user:
+        try:
+            subprocess.run(['chown', sudo_user, md_file], check=False)
+        except Exception:
+            pass
+
 # -------------------------------------------------------------
 # Linux (evdev) implementation
 # -------------------------------------------------------------
@@ -151,6 +161,7 @@ if sys.platform == 'linux':
                     
                 if res.returncode == 0:
                     console.print(f"[green]✓ Captured:[/green] step_{screenshot_counter:03d}.png")
+                    append_to_markdown(screenshot_counter, filename)
                     screenshot_counter += 1
                 else:
                     console.print(f"[red]✗ Error capturing screenshot. Command: {' '.join(cmd)}[/red]")
@@ -206,6 +217,7 @@ else:
                 with mss.mss() as sct:
                     sct.shot(output=filename)
                 console.print(f"[green]✓ Captured:[/green] step_{screenshot_counter:03d}.png")
+                append_to_markdown(screenshot_counter, filename)
                 screenshot_counter += 1
             except Exception as e:
                 console.print(f"[red]✗ Error capturing screenshot: {e}[/red]")
