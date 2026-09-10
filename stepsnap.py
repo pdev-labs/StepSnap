@@ -134,7 +134,6 @@ if sys.platform == 'linux':
             if current_time - last_screenshot_time < COOLDOWN_SECONDS:
                 return
             last_screenshot_time = current_time
-            time.sleep(0.1)
             filename = os.path.join(save_dir, f"step_{screenshot_counter:03d}.png")
             
             cmd = determine_screenshot_cmd(filename)
@@ -235,7 +234,6 @@ else:
                 return
             last_screenshot_time = current_time
             
-            time.sleep(0.1)
             filename = os.path.join(save_dir, f"step_{screenshot_counter:03d}.png")
             try:
                 with mss.mss() as sct:
