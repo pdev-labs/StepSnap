@@ -8,6 +8,8 @@ from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm
+from rich.live import Live
+from rich.text import Text
 
 console = Console()
 CONFIG_FILE = 'config.json'
@@ -76,7 +78,8 @@ if not os.path.exists(save_dir):
 
 console.print("\n" + "="*40)
 console.print(f"[bold cyan]Screenshots will be saved to:[/bold cyan]\n{save_dir}")
-console.print("="*40 + "\n")
+console.print("="*40)
+console.print("\n[dim]Press [bold white]F9[/bold white] to Pause/Resume   |   [bold white]Ctrl+C[/bold white] to Stop[/dim]\n")
 
 screenshot_counter = 1
 screenshot_lock = threading.Lock()
@@ -97,8 +100,8 @@ def append_to_markdown(counter, filename):
 def toggle_pause():
     global is_paused
     is_paused = not is_paused
-    state = "[bold red]PAUSED[/bold red]" if is_paused else "[bold green]RESUMED[/bold green]"
-    console.print(f"\n[bold]⏸ Capture Status:[/bold] {state}")
+    state = "PAUSED" if is_paused else "ACTIVE"
+    color = "red" if is_paused else "green"
 
 # -------------------------------------------------------------
 # Linux (evdev) implementation
@@ -273,10 +276,21 @@ else:
     mouse_listener.start()
     keyboard_listener.start()
 
-# Keep script running
-with console.status("[bold green]Monitoring for actions... Press [bold]F9[/bold] to Pause/Resume. Press [bold]Ctrl+C[/bold] to stop.", spinner="dots"):
-    try:
+# Keep script running with a live status panel
+def make_status_panel():
+    state = "PAUSED ⏸" if is_paused else "ACTIVE ▶"
+    color = "bold red" if is_paused else "bold green"
+    count_info = f"[dim]Screenshots captured:[/dim] [bold white]{screenshot_counter - 1}[/bold white]"
+    controls = "[dim]\[F9] Pause/Resume   \[Ctrl+C] Stop[/dim]"
+    panel_content = Text.from_markup(
+        f"Status: [{color}]{state}[/{color}]   {count_info}\n{controls}"
+    )
+    return Panel(panel_content, title="[bold blue]StepSnap[/bold blue]", border_style="blue")
+
+try:
+    with Live(make_status_panel(), refresh_per_second=4, console=console) as live:
         while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        console.print("\n[bold yellow]Exiting tool. Your screenshots are safe in the Downloads folder![/bold yellow]")
+            live.update(make_status_panel())
+            time.sleep(0.25)
+except KeyboardInterrupt:
+    console.print("\n[bold yellow]Exiting tool. Your screenshots are safe in the Downloads folder![/bold yellow]")
