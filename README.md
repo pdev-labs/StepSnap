@@ -1,62 +1,111 @@
-# StepSnap
+# StepSnap 📸
 
-StepSnap is a lightweight, background screenshot tool designed to help you quickly document your steps for GitHub repositories, tutorials, and Pull Requests.
+> A lightweight, intelligent screenshot tool that automatically documents your workflow steps — perfect for GitHub tutorials, Pull Requests, and issue reports.
 
-It silently runs in the background and automatically takes a screenshot whenever you click your mouse or press the `Enter` key. It is fully **cross-platform**, supporting Windows, macOS, and Linux (both X11 and Wayland).
+StepSnap runs silently in the background and takes a screenshot every time you click your mouse or press `Enter`. It is fully **cross-platform**, supporting **Windows**, **macOS**, and **Linux** (both X11 and Wayland).
 
-## Features
-- **Cross-Platform**: Works everywhere.
-- **Zero-Friction Documentation**: No need to manually trigger screenshots. Just go about your workflow.
-- **Auto-Generate Markdown**: Automatically embeds every screenshot you take into a `steps.md` file that you can copy straight into GitHub!
-- **Wayland Native Support**: Uses `evdev` to detect global inputs directly from the Linux kernel, bypassing Wayland's security blocks on global hotkeys.
-- **Custom Sessions**: Name your own screenshot folders, or let it default to the current date and time.
-- **Pause/Resume**: Press `F9` at any time to temporarily pause the automatic screenshots if you need to do something else.
-- **Click Throttling**: Built-in 1-second cooldown prevents spamming screenshots when you double-click or drag items.
+---
 
-## Installation
+## ✨ Features
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/pdev-labs/StepSnap.git
-   cd StepSnap
-   ```
+| Feature | Description |
+|---|---|
+| 🌍 **Cross-Platform** | Works on Windows, macOS, and Linux (X11 & Wayland) |
+| 📝 **Auto-Generate Markdown** | Automatically builds a `steps.md` file as you work — copy and paste it straight into GitHub! |
+| 🏷️ **Custom Session Names** | Name your screenshot folder per session, or let it default to the current date and time |
+| ⏸️ **Pause / Resume** | Press `F9` anytime to pause and resume capturing |
+| 🐧 **Wayland Native** | Uses `evdev` on Linux to bypass Wayland's security restrictions |
+| 🛡️ **Click Throttling** | 1-second cooldown prevents duplicate screenshots from double-clicks |
+| 🧙 **Setup Wizard** | Interactive terminal wizard to configure your trigger preferences |
 
-2. **Set up a Virtual Environment (Recommended)**:
-   ```bash
-   python -m venv .venv
-   ```
+---
 
-3. **Activate the Environment & Install Dependencies**:
-   
-   **On Windows (PowerShell):**
-   ```powershell
-   .venv\Scripts\Activate.ps1
-   pip install -r requirements.txt
-   ```
-   **On Linux / macOS:**
-   ```bash
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+## 📦 Installation
 
-## Usage
+### 1. Clone the repository
+```bash
+git clone https://github.com/pdev-labs/StepSnap.git
+cd StepSnap
+```
 
-**On Windows and macOS:**
-Just run the script directly. No special permissions are required!
+### 2. Set up a Virtual Environment *(Recommended)*
+```bash
+python -m venv .venv
+```
+
+### 3. Activate & Install Dependencies
+
+**Windows (PowerShell):**
+```powershell
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+**Linux / macOS:**
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+> **Linux users** may need the `evdev` system library: `sudo apt install python3-evdev` (Debian/Ubuntu) or `sudo pacman -S python-evdev` (Arch).
+
+---
+
+## 🚀 Usage
+
+### Windows & macOS
+No special permissions needed! Just run:
 ```bash
 python stepsnap.py
 ```
 
-**On Linux:**
-Because StepSnap relies on `evdev` to read raw input events from the kernel to support strict Wayland environments, **you must run it with `sudo` privileges**. Use the `-E` flag to preserve your Wayland display variables, and point `sudo` to the virtual environment's python executable:
+### Linux (Wayland & X11)
+Because StepSnap reads raw kernel inputs to support Wayland, it must be run with `sudo`. Use the `-E` flag to preserve your display session variables:
 ```bash
 sudo -E .venv/bin/python stepsnap.py
 ```
 
-### The Wizard
+> Also make sure you have a screenshot utility installed: `gnome-screenshot`, `grim`, `spectacle`, or `scrot`.
 
-The first time you run it, a wizard will ask you what actions should trigger a screenshot (Left Click, Right Click, Enter Key). Your preferences are saved automatically!
+---
 
-## License
+## 🎮 Controls
 
-This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file for details.
+| Key | Action |
+|---|---|
+| `F9` | Pause / Resume capturing |
+| `Ctrl+C` | Exit StepSnap |
+
+---
+
+## ⚙️ How It Works
+
+1. **Start the tool** — you'll be greeted by an interactive wizard.
+2. **Name your session** — type a name for the screenshot folder (e.g., `my-github-tutorial`), or press Enter to use the current date and time.
+3. **Configure triggers** — choose whether to capture on left click, right click, and/or the Enter key.
+4. **Do your work** — StepSnap watches silently in the background.
+5. **Find your results** — a timestamped folder is created in your `~/Downloads/` directory containing all your screenshots AND a ready-to-use `steps.md` file.
+
+### Output Example
+```
+~/Downloads/my-github-tutorial/
+├── step_001.png
+├── step_002.png
+├── step_003.png
+└── steps.md        ← Copy & paste this directly into GitHub!
+```
+
+### `steps.md` Example
+```markdown
+### Step 1
+![Step 1](step_001.png)
+
+### Step 2
+![Step 2](step_002.png)
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
