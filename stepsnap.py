@@ -45,6 +45,11 @@ def load_config():
 
 triggers = load_config()
 
+console.print("")
+session_name = console.input("[bold cyan]Enter a folder name for this session[/bold cyan] (leave blank for date/time): ").strip()
+if not session_name:
+    session_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
 # Setup paths based on platform and sudo
 if sys.platform == 'linux':
     if os.geteuid() != 0:
@@ -62,8 +67,7 @@ else:
     sudo_user = None
 
 downloads_path = os.path.join(home_dir, 'Downloads')
-timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-save_dir = os.path.join(downloads_path, timestamp)
+save_dir = os.path.join(downloads_path, session_name)
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
@@ -78,6 +82,7 @@ screenshot_counter = 1
 screenshot_lock = threading.Lock()
 last_screenshot_time = 0.0
 COOLDOWN_SECONDS = 1.0
+is_paused = False
 
 def append_to_markdown(counter, filename):
     md_file = os.path.join(save_dir, "steps.md")
@@ -88,6 +93,12 @@ def append_to_markdown(counter, filename):
             subprocess.run(['chown', sudo_user, md_file], check=False)
         except Exception:
             pass
+
+def toggle_pause():
+    global is_paused
+    is_paused = not is_paused
+    state = "[bold red]PAUSED[/bold red]" if is_paused else "[bold green]RESUMED[/bold green]"
+    console.print(f"\n[bold]⏸ Capture Status:[/bold] {state}")
 
 # -------------------------------------------------------------
 # Linux (evdev) implementation
@@ -115,6 +126,9 @@ if sys.platform == 'linux':
 
     def take_screenshot():
         global screenshot_counter, last_screenshot_time
+        if is_paused:
+            return
+            
         with screenshot_lock:
             current_time = time.time()
             if current_time - last_screenshot_time < COOLDOWN_SECONDS:
@@ -174,6 +188,13 @@ if sys.platform == 'linux':
         try:
             for event in device.read_loop():
                 if event.type == ecodes.EV_KEY and event.value == 1:
+                    if event.code == ecodes.KEY_F9:
+                        toggle_pause()
+                        continue
+                        
+                    if is_paused:
+                        continue
+                        
                     if triggers.get('mouse_left_click') and event.code == ecodes.BTN_LEFT:
                         take_screenshot()
                     elif triggers.get('mouse_right_click') and event.code == ecodes.BTN_RIGHT:
@@ -205,6 +226,9 @@ else:
 
     def take_screenshot():
         global screenshot_counter, last_screenshot_time
+        if is_paused:
+            return
+            
         with screenshot_lock:
             current_time = time.time()
             if current_time - last_screenshot_time < COOLDOWN_SECONDS:
@@ -223,6 +247,8 @@ else:
                 console.print(f"[red]✗ Error capturing screenshot: {e}[/red]")
 
     def on_click(x, y, button, pressed):
+        if is_paused:
+            return
         if pressed:
             if triggers.get('mouse_left_click') and button == mouse.Button.left:
                 take_screenshot()
@@ -231,6 +257,13 @@ else:
 
     def on_press(key):
         try:
+            if key == keyboard.Key.f9:
+                toggle_pause()
+                return
+                
+            if is_paused:
+                return
+                
             if triggers.get('enter_key') and key == keyboard.Key.enter:
                 take_screenshot()
         except AttributeError:
@@ -243,7 +276,7 @@ else:
     keyboard_listener.start()
 
 # Keep script running
-with console.status("[bold green]Monitoring for actions... Press Ctrl+C to stop.", spinner="dots"):
+with console.status("[bold green]Monitoring for actions... Press [bold]F9[/bold] to Pause/Resume. Press [bold]Ctrl+C[/bold] to stop.", spinner="dots"):
     try:
         while True:
             time.sleep(1)

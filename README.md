@@ -7,8 +7,10 @@ It silently runs in the background and automatically takes a screenshot whenever
 ## Features
 - **Cross-Platform**: Works everywhere.
 - **Zero-Friction Documentation**: No need to manually trigger screenshots. Just go about your workflow.
+- **Auto-Generate Markdown**: Automatically embeds every screenshot you take into a `steps.md` file that you can copy straight into GitHub!
 - **Wayland Native Support**: Uses `evdev` to detect global inputs directly from the Linux kernel, bypassing Wayland's security blocks on global hotkeys.
-- **Interactive Setup Wizard**: Beautiful, interactive terminal UI to configure exactly which actions trigger a screenshot.
+- **Custom Sessions**: Name your own screenshot folders, or let it default to the current date and time.
+- **Pause/Resume**: Press `F9` at any time to temporarily pause the automatic screenshots if you need to do something else.
 - **Click Throttling**: Built-in 1-second cooldown prevents spamming screenshots when you double-click or drag items.
 
 ## Installation
