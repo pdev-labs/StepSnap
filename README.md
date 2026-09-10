@@ -15,7 +15,7 @@ It silently runs in the background and automatically takes a screenshot whenever
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/StepSnap.git
+   git clone https://github.com/pdev-labs/StepSnap.git
    cd StepSnap
    ```
 
