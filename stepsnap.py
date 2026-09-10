@@ -55,21 +55,22 @@ while True:
         session_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         break
     
-    # Determine the downloads path to check for existing folder
-    _check_home = os.path.expanduser("~")
-    _check_dir = os.path.join(_check_home, 'Downloads', session_name)
-    
-    if os.path.exists(_check_dir):
-        console.print(f"[bold yellow]⚠ Warning:[/bold yellow] A folder named '[bold]{session_name}[/bold]' already exists in your Downloads.")
-        choice = console.input("  [dim]Type a [bold]new name[/bold] or press [bold]Enter[/bold] to overwrite: [/dim]").strip()
-        if not choice:
-            # User confirmed overwrite
-            console.print(f"[dim]Using existing folder '{session_name}'.[/dim]")
-            break
+    while True:
+        # Check if folder already exists in Downloads
+        _check_home = os.path.expanduser("~")
+        _check_dir = os.path.join(_check_home, 'Downloads', session_name)
+        
+        if os.path.exists(_check_dir):
+            console.print(f"[bold yellow]\u26a0 Warning:[/bold yellow] A folder named '[bold]{session_name}[/bold]' already exists in your Downloads.")
+            choice = console.input("  [dim]Type a [bold]new name[/bold] or press [bold]Enter[/bold] to overwrite: [/dim]").strip()
+            if not choice:
+                console.print(f"[dim]Using existing folder '{session_name}'.[/dim]")
+                break
+            else:
+                session_name = choice  # re-check the new name in the same inner loop
         else:
-            session_name = choice
-    else:
-        break
+            break
+    break
 
 # Setup paths based on platform and sudo
 if sys.platform == 'linux':
@@ -300,7 +301,7 @@ def make_status_panel():
     state = "PAUSED ⏸" if is_paused else "ACTIVE ▶"
     color = "bold red" if is_paused else "bold green"
     count_info = f"[dim]Screenshots captured:[/dim] [bold white]{screenshot_counter - 1}[/bold white]"
-    controls = "[dim]\[F9] Pause/Resume   \[Ctrl+C] Stop[/dim]"
+    controls = "[dim]\\[F9] Pause/Resume   \\[Ctrl+C] Stop[/dim]"
     panel_content = Text.from_markup(
         f"Status: [{color}]{state}[/{color}]   {count_info}\n{controls}"
     )
