@@ -48,9 +48,28 @@ def load_config():
 triggers = load_config()
 
 console.print("")
-session_name = console.input("[bold cyan]Enter a folder name for this session[/bold cyan] (leave blank for date/time): ").strip()
-if not session_name:
-    session_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+console.print("")
+while True:
+    session_name = console.input("[bold cyan]Enter a folder name for this session[/bold cyan] (leave blank for date/time): ").strip()
+    if not session_name:
+        session_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        break
+    
+    # Determine the downloads path to check for existing folder
+    _check_home = os.path.expanduser("~")
+    _check_dir = os.path.join(_check_home, 'Downloads', session_name)
+    
+    if os.path.exists(_check_dir):
+        console.print(f"[bold yellow]⚠ Warning:[/bold yellow] A folder named '[bold]{session_name}[/bold]' already exists in your Downloads.")
+        choice = console.input("  [dim]Type a [bold]new name[/bold] or press [bold]Enter[/bold] to overwrite: [/dim]").strip()
+        if not choice:
+            # User confirmed overwrite
+            console.print(f"[dim]Using existing folder '{session_name}'.[/dim]")
+            break
+        else:
+            session_name = choice
+    else:
+        break
 
 # Setup paths based on platform and sudo
 if sys.platform == 'linux':
